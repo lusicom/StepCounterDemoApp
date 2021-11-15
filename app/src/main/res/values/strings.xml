@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">StepCounterDemoApp</string>
+
+    <string-array name="fps_array">
+        <item>30 fps</item>
+        <item>40 fps</item>
+        <item>50 fps</item>
+        <item>60 fps</item>
+        <item>70 fps</item>
+    </string-array>
 </resources>
