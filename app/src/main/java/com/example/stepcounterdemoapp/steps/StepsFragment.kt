@@ -11,8 +11,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.stepcounterdemoapp.R
 import com.example.stepcounterdemoapp.databinding.FragmentStepsBinding
 import android.widget.Toast
-import androidx.core.view.get
-import java.text.FieldPosition
 
 class StepsFragment : Fragment() {
 
@@ -33,7 +31,7 @@ class StepsFragment : Fragment() {
 
         viewModel.isStarted.observe(
             viewLifecycleOwner,
-            Observer<Boolean> {
+            {
                 when (it) {
                     true -> {
                         binding.button.text = "Stop"
@@ -56,9 +54,9 @@ class StepsFragment : Fragment() {
 
         binding.autoCompleteTextView.setAdapter(adapter)
         binding.autoCompleteTextView.onItemClickListener =
-            AdapterView.OnItemClickListener{parent, view, position, id ->
+            AdapterView.OnItemClickListener { parent, _, position, _ ->
                 val item = parent?.getItemAtPosition(position).toString()
-                Toast.makeText(context,item,Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, item, Toast.LENGTH_SHORT).show()
             }
 
         return binding.root
