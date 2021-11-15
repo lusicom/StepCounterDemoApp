@@ -42,8 +42,6 @@ class StepsFragment : Fragment() {
                 }
             })
 
-
-
         binding.button.setOnClickListener {
             viewModel.changeButtonState()
         }
