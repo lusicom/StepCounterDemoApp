@@ -119,11 +119,11 @@
             app:layout_constraintTop_toBottomOf="@+id/gyro_txt_view" />
 
         <TextView
-            android:id="@+id/magn_txt_view"
+            android:id="@+id/compass_txt_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:text="@string/tv_magnetometer_data"
+            android:text="@string/tv_compass_data"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/acc_txt_view" />
 
