@@ -1,13 +1,18 @@
 package com.example.stepcounterdemoapp.steps
-
+import android.Manifest
+import android.app.Activity
 import android.content.Context
+import android.content.pm.PackageManager
 import android.hardware.*
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -15,8 +20,7 @@ import com.example.stepcounterdemoapp.R
 import com.example.stepcounterdemoapp.databinding.FragmentStepsBinding
 import java.lang.Math.toDegrees
 
-
-class StepsFragment : Fragment(){
+class StepsFragment : Fragment() {
 
     private lateinit var viewModel: StepsViewModel
 
@@ -25,8 +29,7 @@ class StepsFragment : Fragment(){
     private var orientation = FloatArray(3)
     private var rotationMatrix = FloatArray(9)
 
-
-
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -37,23 +40,26 @@ class StepsFragment : Fragment(){
             container,
             false
         )
-
         viewModel = ViewModelProvider(this).get(StepsViewModel::class.java)
 
-        var sensorManager: SensorManager = requireActivity().getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        requestPermissions()
+
+
+        var sensorManager: SensorManager =
+            requireActivity().getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
         val listener: SensorEventListener = object : SensorEventListener {
             override fun onSensorChanged(event: SensorEvent) {
                 if (event.sensor?.type == Sensor.TYPE_GYROSCOPE) {
                     val gyroString = context?.resources?.getString(R.string.tv_gyro_data)
-                    binding.gyroTxtView.text="$gyroString \nx: ${event.values[0]}\n"
+                    binding.gyroTxtView.text = "$gyroString \nx: ${event.values[0]}\n"
                     binding.gyroTxtView.append("y: ${event.values[1]}\n")
                     binding.gyroTxtView.append("z: ${event.values[2]}")
                 }
 
                 if (event.sensor?.type == Sensor.TYPE_ACCELEROMETER) {
                     val accString = context?.resources?.getString(R.string.tv_accelerometer_data)
-                    binding.accTxtView.text="$accString \nx: ${event.values[0]}\n"
+                    binding.accTxtView.text = "$accString \nx: ${event.values[0]}\n"
                     binding.accTxtView.append("y: ${event.values[1]}\n")
                     binding.accTxtView.append("z: ${event.values[2]}")
                     arrayGravity = event.values
@@ -62,13 +68,18 @@ class StepsFragment : Fragment(){
                 if (event.sensor?.type == Sensor.TYPE_MAGNETIC_FIELD) {
                     val compsString = context?.resources?.getString(R.string.tv_compass_data)
                     arrayMagnetic = event.values
-                    SensorManager.getRotationMatrix(rotationMatrix, null, arrayGravity, arrayMagnetic)
+                    SensorManager.getRotationMatrix(
+                        rotationMatrix,
+                        null,
+                        arrayGravity,
+                        arrayMagnetic
+                    )
                     SensorManager.getOrientation(rotationMatrix, orientation)
                     val degrees = (toDegrees(orientation[0].toDouble()) + 360).toFloat() % 360
-                    val compassOrient = when(degrees){
+                    val compassOrient = when (degrees) {
                         in 0.0..23.0 -> "North"
                         in 23.0..67.0 -> "North East"
-                        in 67.0..112.00-> "East"
+                        in 67.0..112.00 -> "East"
                         in 112.0..157.0 -> "South East"
                         in 157.0..202.0 -> "South"
                         in 202.0..247.0 -> "South West"
@@ -106,7 +117,6 @@ class StepsFragment : Fragment(){
                         val sensorAcc = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
                         val sensorMagn = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
 
-
                         val checkedGyro = sensorManager.registerListener(
                             listener,
                             sensorGyro,
@@ -131,7 +141,8 @@ class StepsFragment : Fragment(){
                             SensorManager.SENSOR_DELAY_UI
                         )
                         if (!checkedMagn) {
-                            binding.gyroTxtView.text = "It does not support magnetic field sensor sensors."
+                            binding.gyroTxtView.text =
+                                "It does not support magnetic field sensor sensors."
                         }
                     }
 
@@ -147,5 +158,49 @@ class StepsFragment : Fragment(){
         }
 
         return binding.root
+
+
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun hasActivityRecognitionPermission() =
+        context?.let {
+            ActivityCompat.checkSelfPermission(
+                it,
+                Manifest.permission.ACTIVITY_RECOGNITION)
+        } == PackageManager.PERMISSION_GRANTED
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun requestPermissions(){
+        var permissionsToRequest = mutableListOf<String>()
+        if(!hasActivityRecognitionPermission()){
+            permissionsToRequest.add(Manifest.permission.ACTIVITY_RECOGNITION)
+        }
+
+        if(permissionsToRequest.isNotEmpty()){
+            ActivityCompat.requestPermissions(context as Activity,permissionsToRequest.toTypedArray(),0)
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 0 && grantResults.isNotEmpty()){
+            for (i in grantResults.indices){
+                if (grantResults[i] == PackageManager.PERMISSION_GRANTED){
+                    Log.d("PermissionsRequest", "${permissions[i]} granted.")
+                }
+            }
+        }
     }
 }
+
+
+
+
+
+
+

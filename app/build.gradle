@@ -63,9 +63,11 @@ dependencies {
     //ViewModel
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1'
 
-    // Google Play services client library
+    //gms
     implementation 'com.google.android.gms:play-services-fitness:20.0.0'
     implementation 'com.google.android.gms:play-services-auth:19.2.0'
     implementation 'com.google.android.gms:play-services-location:18.0.0'
 
+    //easy permissions
+//    implementation 'pub.devrel:easypermissions:3.0.0'
 }
